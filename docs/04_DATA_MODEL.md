@@ -1,512 +1,401 @@
-# AETHOS V1 — DATA MODEL
+# 04_DATA_MODEL.md
 
-## 0) Purpose
-This document defines the **canonical data contract** for Aethos V1: the objects we store, the JSON payload shapes, versioning rules, and examples. It is designed to be:
-
-- deterministic and auditable (calculation outputs)
-- safe and compliant (privacy + non-claims)
-- stable for engineers (clear interfaces)
-- extensible (new systems and features without breaking old data)
+## Aethos V1 – Data Model (Canonical Facts → Timing Events → Journal → Correlations)
 
 ---
 
-## 1) Design Principles
+# I. Purpose
 
-### 1.1 Canonical Birth Source
-All symbolic systems derive from **one** canonical birth object:
-- local datetime + timezone
-- geocoded coordinates
-- canonical UTC + JD UT
+This document defines the **minimum viable data model** for Aethos V1.
 
-**Rule:** Every system layer must be reproducible from these canonical fields + explicit settings.
+Aethos is not “content-first.”  
+It is a **structured symbolic analytics system**.
 
-### 1.2 Layered System Outputs
-Each symbolic system is stored as its own JSON layer:
-- `western_tropical`
-- `vedic_sidereal`
-- `human_design`
-- `bazi`
-- `numerology`
+The data model must support:
 
-Downstream modules (timing, journaling, protocols) consume a **unified profile view**, but the stored truth remains separated by system.
-
-### 1.3 Version Everything
-Every computed payload includes:
-- `engine_version` (semantic version)
-- `settings` (e.g., house system, ayanamsa, HD wheel mapping version)
-- `computed_at` timestamp (UTC)
-
-### 1.4 Privacy Default
-- Birth profile is sensitive.
-- Journal notes are sensitive.
-- Store minimum required for V1, encrypt at rest.
+1. Deterministic computation from a single truth source (birth input)
+2. Reproducible timing events (transits → natal)
+3. Journaling + state tracking
+4. Correlation summaries (descriptive, not causal)
+5. Privacy separation between identity, birth facts, and reflective content
 
 ---
 
-## 2) Core Entities (Conceptual)
+# II. Core Design Principles
 
-### 2.1 User
-Represents a human account.
+## P1 — One Truth Source
+Birth data is canonicalized once into:
+- UTC
+- Julian Day
+- Lat/Lon
+and then all systems compute from that.
 
-### 2.2 BirthProfile (Canonical)
-Truth-source for all deterministic computations.
+## P2 — Facts are Immutable, Interpretations are Versioned
+Computed facts (planet longitudes, aspects) are deterministic.
+Interpretations and salience scoring are versioned.
 
-### 2.3 SystemProfile (Per-system JSON)
-Computed “facts layer” for each symbolic system.
+## P3 — Separation of Concerns
+- Identity/auth in one table
+- Canonical birth facts separated
+- Journaling encrypted
+- Analytics logs user-deletable
 
-### 2.4 DailyActivation
-Daily timing events generated from transits and natal profile.
-
-### 2.5 JournalEntry
-User-provided reflection signals.
+## P4 — Minimal First, Expand Later
+V1 stores only what is required to support:
+Today → Journal → Weekly → Monthly.
 
 ---
 
-## 3) Database Tables (V1)
+# III. Entity Map (V1)
 
-Recommended database: PostgreSQL with JSONB for system payloads.
+**User**
+→ has one **BirthProfile**
+→ generates many **TimingEvents**
+→ writes many **JournalEntries**
+→ receives many **CorrelationSummaries**
+→ produces many **AnalyticsEvents** (telemetry)
 
-### 3.1 `users`
+---
+
+# IV. Canonical Entities
+
+## 1) users
+Represents authentication identity.
+
 **Fields**
-- `id` (UUID, PK)
-- `email` (unique)
-- `password_hash` (or oauth fields)
-- `created_at` (timestamp)
-- `updated_at` (timestamp)
+- user_id (UUID, PK)
+- email (unique)
+- password_hash (or auth_provider_id)
+- created_at (UTC)
+- updated_at (UTC)
+- status (active, paused, deleted)
+- cohort_tag (string, optional)
 
 **Notes**
-- Keep auth separate from symbolic data.
-- Support OAuth later without schema pain.
+- Do not store birth data in this table.
+- Keep this table portable for auth migrations.
 
 ---
 
-### 3.2 `birth_profiles`
-**Fields**
-- `id` (UUID, PK)
-- `user_id` (UUID, FK → users.id)
-- `local_datetime` (timestamp, no tz)
-- `timezone` (IANA tz string, e.g., `America/Detroit`)
-- `utc_datetime` (timestamp with tz)
-- `jd_ut` (double precision)
-- `lat` (double precision)
-- `lon` (double precision)
-- `place_label` (text; human readable)
-- `place_source` (text; provider name, optional)
-- `birth_time_confidence` (enum: `exact | approx | unknown`)
-- `created_at`, `updated_at`
-
-**Notes**
-- `jd_ut` is the canonical numeric time anchor for all engines.
-- `birth_time_confidence` informs UX and interpretation confidence.
-- `place_label` is display only; compute from lat/lon.
-
----
-
-### 3.3 `system_profiles`
-Stores one row per system per user.
+## 2) birth_profiles
+The canonical truth source.
 
 **Fields**
-- `id` (UUID, PK)
-- `user_id` (UUID, FK)
-- `system_name` (text; constrained to known names)
-- `engine_version` (text; e.g., `1.0.0`)
-- `settings_json` (jsonb)
-- `payload_json` (jsonb)
-- `computed_at` (timestamp with tz)
+- profile_id (UUID, PK)
+- user_id (UUID, FK users.user_id)
+- full_name (optional)
+- birth_date_local (YYYY-MM-DD)
+- birth_time_local (HH:MM:SS or null if unknown)
+- birth_time_confidence (exact, approximate, unknown)
+- birthplace_raw (string user entered)
+- birthplace_resolved (string normalized)
+- lat (float)
+- lon (float)
+- tzid (IANA timezone string, e.g., "America/Detroit")
+- utc_datetime (timestamp UTC)
+- julian_day_ut (float)
+- canonicalization_version (string)
+- created_at (UTC)
+- updated_at (UTC)
 
-**Indexes**
-- unique: (`user_id`, `system_name`) — latest only, V1
-  - or allow history later with (`user_id`,`system_name`,`computed_at`)
+**Rules**
+- If birth_time_confidence = unknown:
+  - utc_datetime and julian_day_ut reflect noon local default OR null (choose one and document)
+  - angles/houses disabled downstream
+- Canonicalization version increments if timezone/geo rules change.
 
 ---
 
-### 3.4 `daily_activations`
+# V. Computed Facts Layer (Deterministic Output)
+
+Aethos computes chart facts on demand, but V1 may cache them for speed.
+
+## 3) chart_facts_cache (optional but recommended)
+Stores deterministic computed placements so you don’t recompute constantly.
+
 **Fields**
-- `id` (UUID, PK)
-- `user_id` (UUID, FK)
-- `date_utc` (date)
-- `engine_version` (text)
-- `settings_json` (jsonb)  — orb rules, aspect list, weighting
-- `payload_json` (jsonb)
-- `computed_at` (timestamp with tz)
+- facts_id (UUID, PK)
+- profile_id (UUID, FK birth_profiles.profile_id)
+- system (enum: western_tropical, vedic_sidereal)
+- house_system (enum: whole_sign)
+- computation_version (string)  # ephemeris flags + logic version
+- payload (JSONB)              # packed points, houses, angles, etc.
+- created_at (UTC)
 
-**Indexes**
-- unique: (`user_id`, `date_utc`)
-
----
-
-### 3.5 `journal_entries`
-**Fields**
-- `id` (UUID, PK)
-- `user_id` (UUID, FK)
-- `date_local` (date)
-- `date_utc` (date) — derived; for correlation alignment
-- `mood_score` (int; 1–10)
-- `tags` (text[] or jsonb)
-- `note` (text) — encrypt at rest
-- `created_at`, `updated_at`
-
-**Indexes**
-- (`user_id`, `date_local`) unique or not (decide: one entry per day in V1 is simplest)
-
----
-
-## 4) Canonical JSON Contracts
-
-This section defines the JSON payload shapes stored inside `system_profiles.payload_json` and `daily_activations.payload_json`.
-
----
-
-## 4.1 BirthProfile JSON (API Return Shape)
-This is the canonical object returned by `GET /profile/summary`.
-
+**Payload shape (example)**
 ```json
 {
-  "birth_profile": {
-    "local_datetime": "1991-11-06T17:43:00",
-    "timezone": "America/Detroit",
+  "points": {
+    "Sun": {"lon": 224.123456, "lat": 0.0001, "speed": 0.98},
+    "Moon": {"lon": 225.987654, "lat": 4.81, "speed": 13.2}
+  },
+  "angles": {"asc": 49.12, "mc": 298.44},
+  "houses": {"sign_1": "Taurus", "sign_2": "Gemini", "...": "..."}
+}
+Notes
+
+Facts are not “interpretations.”
+
+Payloads are reproducible from canonical birth profile + computation_version.
+
+VI. Timing Events Layer (Daily Engine Output)
+4) timing_events
+
+One row per event detected in a time window.
+
+Fields
+
+event_id (UUID, PK)
+
+profile_id (UUID, FK birth_profiles.profile_id)
+
+event_date_local (YYYY-MM-DD)
+
+event_window_start_utc (timestamp)
+
+event_window_end_utc (timestamp)
+
+Core event attributes
+
+transit_body (string, e.g., "Mars")
+
+natal_point (string, e.g., "Sun", "Asc", "MC")
+
+aspect_type (enum: conj, opp, sq, tri, sex)
+
+orb_deg (float)
+
+applying (bool)
+
+hard_soft (enum: hard, soft)
+
+natal_house (int 1–12, nullable if unknown time)
+
+activated_house (int 1–12, nullable)
+
+exactitude_utc (timestamp nullable; only when computed)
+
+salience_score (int 0–100)
+
+Versioning
+
+timing_engine_version (string)
+
+salience_model_version (string)
+
+Purpose
+
+Powers Today view ranking
+
+Links into journal entries
+
+Feeds correlation engine
+
+VII. Journaling Layer (Encrypted Content + Structured Metrics)
+5) journal_entries
+
+Stores reflective entries + numeric state signals.
+
+Fields
+
+entry_id (UUID, PK)
+
+user_id (UUID, FK users.user_id)
+
+profile_id (UUID, FK birth_profiles.profile_id)
+
+created_at_utc (timestamp)
+
+created_at_local (timestamp)
+
+timezone_at_entry (IANA string)
+
+Quant signals
+
+mood (int 1–10)
+
+energy (int 1–10)
+
+stress (int 1–10)
+
+Text
+
+text_encrypted (bytea or text)
+
+encryption_version (string)
+
+Tags / links
+
+tag_list (text[] or JSONB)
+
+linked_event_ids (UUID[])
+
+Notes
+
+Never store plaintext journal body.
+
+Keep quant signals unencrypted for correlation computations (still private).
+
+VIII. Correlation Summaries (Derived, Descriptive Only)
+6) correlation_summaries
+
+Stores computed weekly/monthly summaries.
+
+Fields
+
+summary_id (UUID, PK)
+
+user_id (UUID, FK users.user_id)
+
+profile_id (UUID, FK birth_profiles.profile_id)
+
+period_type (enum: week, month)
+
+period_start_local (YYYY-MM-DD)
+
+period_end_local (YYYY-MM-DD)
+
+generated_at_utc (timestamp)
+
+correlation_engine_version (string)
+
+payload (JSONB)
+
+Payload shape (example)
+
+{
+  "entries_count": 14,
+  "avg_mood": 6.4,
+  "avg_stress": 7.1,
+  "hard_aspects_days": 5,
+  "soft_aspects_days": 3,
+  "top_planets": [{"planet": "Mars", "count": 6}],
+  "top_houses": [{"house": 7, "count": 8}],
+  "associations": [
+    {"label": "hard_aspects_vs_stress", "value": 0.22, "type": "descriptive"}
+  ],
+  "insight_density_score": 0.31
+}
+
+
+Language rule
+
+Associations are labeled “descriptive”
+
+Never claim causality
+
+IX. Analytics Events (Telemetry)
+7) analytics_events
+
+Tracks product usage and computation events.
+
+Fields
+
+event_id (UUID, PK)
+
+user_id (UUID, FK users.user_id)
+
+profile_id (UUID nullable)
+
+event_type (string)
+
+payload (JSONB)
+
+created_at_utc (timestamp)
+
+event_version (string)
+
+Examples
+
+today_view_loaded
+
+activation_detail_opened
+
+journal_entry_created
+
+weekly_summary_viewed
+
+X. Minimal JSON Profile Output (App-facing)
+
+The app consumes a profile JSON, built from canonical + cached facts.
+
+V1 recommended output shape:
+
+{
+  "profile_id": "uuid",
+  "canonical": {
     "utc_datetime": "1991-11-06T22:43:00Z",
-    "jd_ut": 2448568.44653,
-    "location": {
-      "lat": 41.9464,
-      "lon": -86.3389,
-      "place_label": "Berrien Springs, MI, USA",
-      "place_source": "geocoder_v1"
-    },
+    "julian_day_ut": 2448567.44653,
+    "lat": 41.9464,
+    "lon": -86.3389,
+    "tzid": "America/Detroit",
     "birth_time_confidence": "exact"
-  }
-}
-4.2 Shared Primitive Types
-4.2.1 Point (Planet/Angle) Object
-json
-Copy code
-{
-  "name": "Sun",
-  "lon": 224.123456,
-  "lat": -0.000012,
-  "speed_lon": 0.985647,
-  "sign": "Scorpio",
-  "sign_index": 7,
-  "deg_in_sign": 14.123456
-}
-4.2.2 Aspect Object (Natal or Transit)
-json
-Copy code
-{
-  "transit_body": "Mars",
-  "natal_point": "Sun",
-  "aspect": "square",
-  "exact_angle": 90,
-  "orb_deg": 1.42,
-  "polarity": "hard",
-  "intensity": 0.78,
-  "confidence": "high"
-}
-4.2.3 Engine Metadata
-Included in every system payload and activations payload:
-
-json
-Copy code
-{
-  "engine_version": "1.0.0",
-  "computed_at": "2026-02-16T21:10:00Z",
-  "settings": { "house_system": "whole_sign" }
-}
-5) System Payload Shapes
-5.1 Western Tropical (system_name = western_tropical)
-Minimum V1 shape (facts-only, no interpretive prose):
-
-json
-Copy code
-{
-  "engine_version": "1.0.0",
-  "computed_at": "2026-02-16T21:10:00Z",
-  "settings": {
-    "zodiac": "tropical",
+  },
+  "systems": {
+    "western_tropical": { "facts_ref": "chart_facts_cache.facts_id" },
+    "vedic_sidereal":   { "facts_ref": "chart_facts_cache.facts_id" }
+  },
+  "summary": {
     "house_system": "whole_sign",
-    "ephemeris": "swisseph"
-  },
-  "angles": {
-    "Asc": { "lon": 49.123456, "sign": "Taurus", "deg_in_sign": 19.123456 },
-    "MC":  { "lon": 298.654321, "sign": "Capricorn", "deg_in_sign": 28.654321 }
-  },
-  "points": {
-    "Sun":   { "lon": 224.123456, "sign": "Scorpio", "deg_in_sign": 14.123456 },
-    "Moon":  { "lon": 210.654321, "sign": "Scorpio", "deg_in_sign": 0.654321 },
-    "Mercury":{ "lon": 215.111111, "sign": "Scorpio", "deg_in_sign": 5.111111 }
-  },
-  "houses": {
-    "system": "whole_sign",
-    "asc_sign": "Taurus",
-    "house_signs": {
-      "1": "Taurus",
-      "2": "Gemini",
-      "3": "Cancer",
-      "4": "Leo",
-      "5": "Virgo",
-      "6": "Libra",
-      "7": "Scorpio",
-      "8": "Sagittarius",
-      "9": "Capricorn",
-      "10": "Aquarius",
-      "11": "Pisces",
-      "12": "Aries"
-    }
+    "notes": ["Aethos provides reflective timing intelligence; not deterministic prediction."]
   }
 }
-Notes
 
-points can include all planets later; V1 can ship core luminaries + personal planets first if needed.
+XI. Data Retention & Deletion Rules (V1)
 
-angles are essential for house alignment and timing.
+User must be able to delete:
 
-5.2 Vedic Sidereal (system_name = vedic_sidereal)
-V1 includes placements + nakshatra/pada for Sun/Moon at minimum.
+Journal entries (immediate hard delete)
 
-json
-Copy code
-{
-  "engine_version": "1.0.0",
-  "computed_at": "2026-02-16T21:10:00Z",
-  "settings": {
-    "zodiac": "sidereal",
-    "ayanamsa": "lahiri",
-    "ephemeris": "swisseph"
-  },
-  "points": {
-    "Sun":  { "lon": 200.456789, "sign": "Libra", "deg_in_sign": 20.456789 },
-    "Moon": { "lon": 341.987654, "sign": "Pisces", "deg_in_sign": 11.987654 }
-  },
-  "nakshatras": {
-    "Sun":  { "name": "Vishakha", "pada": 2 },
-    "Moon": { "name": "Uttara Bhadrapada", "pada": 3 }
-  }
-}
-5.3 Human Design (system_name = human_design)
-V1 shape prioritizes:
+Birth profile (hard delete)
 
-design-time solver metadata
+Analytics logs (hard delete)
 
-gate/line activations for key bodies
+Entire account (cascading delete)
 
-derived type/profile if implemented
+Retention defaults:
 
-json
-Copy code
-{
-  "engine_version": "1.0.0",
-  "computed_at": "2026-02-16T21:10:00Z",
-  "settings": {
-    "design_sun_offset_deg": 88.0,
-    "wheel_mapping_version": "hd_wheel_v1",
-    "ephemeris": "swisseph",
-    "zodiac_basis": "tropical"
-  },
-  "design_moment": {
-    "jd_ut": 2448480.12345,
-    "utc_datetime": "1991-08-09T02:57:00Z",
-    "solver": {
-      "method": "bracket+bisection",
-      "tolerance_deg": 0.01,
-      "iterations": 42
-    }
-  },
-  "personality": {
-    "Sun":   { "gate": 44, "line": 3, "lon": 224.123456 },
-    "Earth": { "gate": 24, "line": 3, "lon": 44.123456 },
-    "Moon":  { "gate": 1,  "line": 2, "lon": 210.654321 }
-  },
-  "design": {
-    "Sun":   { "gate": 1,  "line": 3, "lon": 136.123456 },
-    "Earth": { "gate": 2,  "line": 3, "lon": 316.123456 }
-  },
-  "derived": {
-    "type": "Reflector",
-    "strategy": "Wait a Lunar Cycle",
-    "authority": "Lunar",
-    "profile": "1/3",
-    "confidence": {
-      "type": "high",
-      "reason": "no defined centers (reflector rule)"
-    }
-  }
-}
-Notes
+analytics_events: 12 months
 
-Do not ship bogus gate mapping. Use canonical wheel mapping.
+correlation_summaries: indefinite (but deleted if user deletes account)
 
-derived can be phased; V1 may ship activations first if needed.
+journal_entries: indefinite until user deletes
 
-5.4 BaZi (system_name = bazi)
-V1 includes Four Pillars + declared mode.
+XII. Future Expansion Hooks (Not V1)
 
-json
-Copy code
-{
-  "engine_version": "1.0.0",
-  "computed_at": "2026-02-16T21:10:00Z",
-  "settings": {
-    "mode": "standard_clock_time",
-    "calendar_basis": "jieqi_solar_terms",
-    "location_included": true
-  },
-  "pillars": {
-    "year":  { "stem": "Xin", "branch": "Wei", "element": "Metal", "animal": "Goat" },
-    "month": { "stem": "Wu",  "branch": "Xu",  "element": "Earth", "animal": "Dog" },
-    "day":   { "stem": "Bing","branch": "Zi",  "element": "Fire",  "animal": "Rat" },
-    "hour":  { "stem": "Ding","branch": "You", "element": "Fire",  "animal": "Rooster" }
-  },
-  "day_master": { "stem": "Bing", "element": "Yang Fire" }
-}
-Notes
+Planned later entities:
 
-Pillar values above are example placeholders; actual computation must be validated.
+protocols (behavioral suggestions engine)
 
-Explicitly store mode to prevent disputes and allow upgrades later.
+prompt_templates (journaling prompts)
 
-5.5 Numerology (system_name = numerology)
-V1 includes birth-date derived numbers; name-based numbers optional.
+multi-system facts (Human Design, Gene Keys, BaZi)
 
-json
-Copy code
-{
-  "engine_version": "1.0.0",
-  "computed_at": "2026-02-16T21:10:00Z",
-  "settings": {
-    "system": "pythagorean",
-    "name_included": false
-  },
-  "birth": {
-    "life_path": 1,
-    "birth_day": 6
-  },
-  "name": null
-}
-6) Unified Profile Summary (API Convenience)
-The API can present a summary view composed from system layers:
+anonymized cohort benchmarks
 
-json
-Copy code
-{
-  "summary": {
-    "core_identity": {
-      "western": { "Sun": "Scorpio", "Moon": "Scorpio", "Asc": "Taurus" },
-      "vedic": { "Moon_nakshatra": "Uttara Bhadrapada (Pada 3)" },
-      "human_design": { "type": "Reflector", "profile": "1/3" },
-      "bazi": { "day_master": "Yang Fire" }
-    },
-    "non_claims_version": "v1",
-    "generated_at": "2026-02-16T21:10:00Z"
-  }
-}
-Important
+V1 structure supports these without migration pain.
 
-This summary is derived; the truth lives in system layers.
+XIII. Engineering Notes (Implementation Choices)
 
-7) Daily Activations Payload (daily_activations.payload_json)
-json
-Copy code
-{
-  "engine_version": "1.0.0",
-  "computed_at": "2026-02-16T08:00:00Z",
-  "settings": {
-    "aspects": ["conjunction","opposition","square","trine","sextile"],
-    "orb_policy_deg": {
-      "luminaries": 8.0,
-      "personal": 6.0,
-      "outer": 4.0,
-      "angles": 3.0
-    },
-    "scoring": { "hard_weight": 1.0, "soft_weight": 0.7 }
-  },
-  "summary": {
-    "overall_intensity": 0.62,
-    "top_activations": [
-      { "label": "Mars square Sun", "intensity": 0.78 },
-      { "label": "Venus trine Moon", "intensity": 0.55 }
-    ]
-  },
-  "events": [
-    {
-      "transit_body": "Mars",
-      "natal_point": "Sun",
-      "aspect": "square",
-      "exact_angle": 90,
-      "orb_deg": 1.42,
-      "polarity": "hard",
-      "intensity": 0.78,
-      "confidence": "high"
-    }
-  ]
-}
-8) Journal Entry API Shape
-Request:
+Recommended DB: Postgres
 
-json
-Copy code
-{
-  "date_local": "2026-02-16",
-  "mood_score": 6,
-  "tags": ["work", "social", "anxiety"],
-  "note": "Felt pressure but stayed focused."
-}
-Stored object:
+Recommended types:
 
-json
-Copy code
-{
-  "id": "uuid",
-  "date_local": "2026-02-16",
-  "date_utc": "2026-02-16",
-  "mood_score": 6,
-  "tags": ["work", "social", "anxiety"],
-  "created_at": "2026-02-16T21:15:00Z"
-}
-9) Versioning & Migration Rules
-9.1 Engine Versions
-Every system payload includes engine_version.
+JSONB for payloads
 
-If computation logic changes, increment version and recompute.
+arrays for linked_event_ids, tag_list
 
-9.2 Settings Must Persist
-Settings are stored alongside payloads so historical outputs are interpretable:
+Encryption:
 
-house system
+libsodium or KMS-managed envelope encryption
 
-ayanamsa
+encryption_version stored per entry
 
-HD wheel mapping version
+Versioning:
+Every compute layer stores its version string.
 
-BaZi mode
+This prevents "silent changes" and preserves user trust.
 
-9.3 Forward Compatibility
-New fields can be added at any time.
 
-Breaking changes require a new version and a migration note.
-
-10) Data Quality & Validation (V1)
-10.1 Canonicalization Checks
-Ensure timezone resolves to IANA string.
-
-Ensure UTC datetime and JD UT roundtrip consistently.
-
-Ensure lat/lon within valid bounds.
-
-10.2 Deterministic Testing
-Maintain fixtures:
-
-a set of known birth profiles
-
-expected hashes of output JSON blocks
-
-regression tests to detect drift
-
-11) Open Questions (To Close Before Build)
-
-Do we allow multiple journal entries per day (V1: recommend single entry)?
-
-Do we store full planetary sets in V1 or only core points?
-
-Do we compute and store natal aspects in V1, or only daily transits?
-
-What minimum Human Design output is acceptable for V1 (activations only vs derived type/profile)?
+Next move: do you want me to harden `05_API_SPEC.md` into an endpoint-by-endpoint contract that matches this model (including request/response JSON + error codes)?
+::contentReference[oaicite:0]{index=0}
