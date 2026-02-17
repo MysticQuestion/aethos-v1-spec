@@ -1,17 +1,3 @@
-Good.
-
-You’re asking for **institutional-grade depth**, not startup-blog fluff.
-
-We’re going to make this roadmap something a serious CTO, a disciplined angel, or a SkyDeck reviewer could read and say:
-
-> “This is sequenced. This is constrained. This founder understands build risk.”
-
-Replace your current `docs/11_ROADMAP_MILESTONES.md` with the version below.
-
-This is the complete, capital-aware, systems-aware roadmap.
-
----
-
 # 11_ROADMAP_MILESTONES.md
 
 ## Aethos – Full Execution Roadmap (V1 → Validation → Scale)
@@ -41,9 +27,7 @@ The roadmap is intentionally sequential, not parallel.
 V1 must prove three hypotheses:
 
 ### H1 – Timing signals feel meaningful when paired with journaling.
-
 ### H2 – Users will pay for structured symbolic reflection.
-
 ### H3 – Pattern awareness improves retention.
 
 Everything in this roadmap supports validating those hypotheses.
@@ -57,10 +41,7 @@ Nothing else.
 **Duration: 2–3 weeks**
 
 ## Objective:
-
 Stabilize architecture, scope, and hiring clarity before writing production code.
-
----
 
 ### Deliverables:
 
@@ -74,8 +55,6 @@ Stabilize architecture, scope, and hiring clarity before writing production code
 * Hiring brief prepared
 * Calculation layer scaffolded
 
----
-
 ### Technical Decisions Locked in Phase 0:
 
 * Canonical birth input as single source of truth
@@ -84,8 +63,6 @@ Stabilize architecture, scope, and hiring clarity before writing production code
 * Deterministic output only (no probabilistic ML)
 * Journal data stored separately from computed timing facts
 * No AI interpretation in V1
-
----
 
 ### Exit Criteria:
 
@@ -100,8 +77,6 @@ Stabilize architecture, scope, and hiring clarity before writing production code
 **Duration: 8–10 weeks**
 
 This phase builds the deterministic spine.
-
----
 
 ## 1. Backend Engineering Milestones
 
@@ -194,7 +169,6 @@ Compute:
 
 No causality claims.
 No predictive overlays.
-
 Pure statistical correlation.
 
 ---
@@ -270,19 +244,11 @@ Exportable summary (Phase 1.5 optional).
 
 **Duration: 8–12 weeks**
 
----
-
 ## Objective:
-
 Prove retention and insight density.
 
----
-
 ## Cohort Size:
-
 50–100 curated users.
-
----
 
 ## Metrics Monitored:
 
@@ -291,8 +257,6 @@ Prove retention and insight density.
 * Journaling compliance (≥3 entries/week)
 * Clarity score (1–10)
 * Support burden per 20 users
-
----
 
 ## Iteration Allowed:
 
@@ -307,8 +271,6 @@ Not allowed:
 * AI interpretation layer
 * Social features
 
----
-
 ### Phase 2 Exit Criteria:
 
 * ≥60% Month 2 retention
@@ -322,8 +284,6 @@ If not achieved → refine engine before scaling.
 
 # VI. Phase 3 — System Expansion (Only if V1 Validated)
 
----
-
 ## Expansion Track A — Human Design Overlay
 
 * Gate calculation integrated into UI
@@ -331,15 +291,11 @@ If not achieved → refine engine before scaling.
 * Limited centers view
 * No full bodygraph complexity yet
 
----
-
 ## Expansion Track B — Gene Keys Reflection Layer
 
 * Shadow → Gift display
 * Optional contemplative journaling mode
 * No Siddhi mystical framing in UX
-
----
 
 ## Expansion Track C — Advanced Correlation Engine
 
@@ -370,19 +326,15 @@ Raise only if:
 # VIII. Risk & Constraint Management
 
 ### Risk 1 — Founder overload
-
 Mitigation: strict feature discipline.
 
 ### Risk 2 — Overbuilding
-
 Mitigation: enforce V1 exclusion list.
 
 ### Risk 3 — Low retention
-
 Mitigation: tighten cohort curation.
 
 ### Risk 4 — Misinterpretation as prediction tool
-
 Mitigation: compliance language always visible.
 
 ---
@@ -422,228 +374,116 @@ If these are achieved:
 
 Aethos transitions from experiment → platform.
 
-XI. Dependency Graph (Critical Path Map)
+---
 
-V1 development is gated by deterministic sequencing.
+# XI. Dependency Graph (Critical Path Map)
 
-Core Dependency Chain
+Core Dependency Chain:
 
-Canonical Birth Engine
-→ Transit Engine
-→ Salience Model
-→ Journal Service
-→ Correlation Engine
-→ Weekly Summary
-→ Monthly Report
-→ Beta Launch
+Canonical Birth Engine  
+→ Transit Engine  
+→ Salience Model  
+→ Journal Service  
+→ Correlation Engine  
+→ Weekly Summary  
+→ Monthly Report  
+→ Beta Launch  
 
-If Canonical Birth is unstable → everything collapses.
-
-If Journal pipeline fails → correlation meaningless.
-
-If Salience scoring incoherent → retention collapses.
-
-Therefore:
-
-No frontend polish before canonical engine passes validation.
-
-No marketing before correlation engine works.
-
+No frontend polish before canonical engine passes validation.  
+No marketing before correlation engine works.  
 No expansion systems until retention validated.
 
-This is non-negotiable.
+---
 
-XII. Resource Model (Realistic Founder Constraints)
+# XII. Resource Model
 
-Assume:
+Estimated Phase 1 engineering:
 
-Founder (you) = 0.5–1.0 FTE strategy + product
+* Canonical chart engine: 40–60 hours
+* Transit + salience engine: 60–80 hours
+* Journal service: 30–40 hours
+* Correlation v1: 40–60 hours
+* Frontend core views: 80–120 hours
+* QA + integration: 40–60 hours
 
-Fractional backend engineer = 0.5 FTE
+Total: ~300–400 engineering hours  
+Estimated cost: $22k–$50k
 
-Optional frontend contractor = 0.25 FTE
+---
 
-No full-time hires initially
-
-Estimated engineering hours (Phase 1):
-
-Canonical chart engine: 40–60 hours
-
-Transit + salience engine: 60–80 hours
-
-Journal service: 30–40 hours
-
-Correlation v1: 40–60 hours
-
-Frontend core views: 80–120 hours
-
-QA + integration: 40–60 hours
-
-Total: ~300–400 engineering hours
-
-At $75–125/hr:
-$22k–$50k realistic cost range.
-
-This is important.
-
-Investors respect founders who understand cost.
-
-XIII. Infrastructure Assumptions (V1)
+# XIII. Infrastructure Assumptions
 
 Backend:
-
-Python (FastAPI)
-
-Postgres
-
-Redis (optional cache)
-
-Stripe billing
+Python (FastAPI), Postgres, Redis (optional), Stripe
 
 Hosting:
-
 Vercel / Render / Railway / Fly.io
 
-Monthly infra estimate: $50–$200 initially
+Infra estimate:
+$50–$200/month initial
 
 Data:
+Birth data encrypted  
+Journal encrypted at rest  
 
-Birth data encrypted
+Compliance:
+Not medical advice  
+Not predictive claims  
+Clear ToS + Privacy  
 
-Journal encrypted at rest
+---
 
-No unnecessary third-party sharing
+# XIV. Technical Risk Register
 
-Compliance posture:
+TR1 — Timezone Errors  
+TR2 — Swiss Ephemeris mismatches  
+TR3 — Overcomplicated salience model  
+TR4 — Correlation overstatement  
+TR5 — Journal engagement drop  
 
-Not medical advice
+Mitigations documented in spec.
 
-Not predictive claims
+---
 
-Clear ToS + Privacy
+# XV. Budget Strategy
 
-XIV. Technical Risk Register (Deeper Layer)
-TR1 — Timezone Resolution Errors
+Bootstrapped: $15k–$30k  
+Pre-seed: $100k–$250k  
 
-Impact: incorrect birth chart.
-Mitigation: use authoritative timezone DB (IANA), test historical cases.
+Roadmap assumes bootstrapped until validated.
 
-TR2 — Swiss Ephemeris integration issues
+---
 
-Impact: mismatched planetary data.
-Mitigation: benchmark against Astro.com known charts.
+# XVI. Kill Criteria
 
-TR3 — Overcomplicated salience model
+After 90 days:
 
-Impact: user confusion.
-Mitigation: keep v1 formula simple + transparent.
+* Retention <40%
+* Journaling <30%
+* Clarity <6
+* Support burden too high
 
-TR4 — Correlation overstatement
+→ Pause. Simplify. Refactor. Pivot if necessary.
 
-Impact: legal/ethical risk.
-Mitigation: enforce language filters in UI.
+---
 
-TR5 — Journal engagement drop
+# XVII. Expansion Gate Conditions
 
-Impact: retention failure.
-Mitigation: friction-reduced 60-second check-in mode.
+No BaZi, Full HD, AI synthesis, or Social Layer  
+until ≥60% retention sustained for 60 days.
 
-XV. Budget Envelope Strategy
-Scenario A — Bootstrapped
+---
 
-Founder funds:
-$15k–$30k initial build
+# XVIII. Long-Term Architecture Trajectory
 
-Pros:
+Post-validation:
 
-Control
+* Mobile wrapper
+* Advanced correlation visualization
+* API layer
+* Research partnerships
+* White-label engine
 
-Clean cap table
-
-Strong signal at raise
-
-Cons:
-
-Slower build
-
-Founder stress
-
-Scenario B — Pre-Seed Before Build
-
-Raise $100k–$250k
-
-Pros:
-
-Faster execution
-
-Reduced founder risk
-
-Cons:
-
-Valuation pressure
-
-Build before validation
-
-Roadmap assumes Scenario A until proven otherwise.
-
-XVI. Kill Criteria (Intellectual Honesty Clause)
-
-If after 90 days of beta:
-
-Retention <40%
-
-Journaling compliance <30%
-
-Clarity score <6
-
-Users describe product as “confusing”
-
-Support burden > 1 ticket per 10 users per week
-
-Then:
-
-Pause expansion.
-Refactor engine.
-Simplify.
-
-If refactor fails → pivot or sunset.
-
-Serious founders define kill thresholds.
-
-XVII. Expansion Gate Conditions
-
-You may not add:
-
-BaZi
-
-Full Human Design
-
-AI synthesis
-
-Social layer
-
-Until:
-
-Retention ≥60% sustained for 60 days.
-
-This protects product integrity.
-
-XVIII. Long-Term Architecture Trajectory (Post V1)
-
-If validated:
-
-Year 1 roadmap:
-
-Mobile wrapper
-
-Advanced correlation visualization
-
-API layer for enterprise
-
-Structured research partnerships
-
-Possible white-label engine
-
-But only after core retention proven.
+Only after retention proven.
 
 
