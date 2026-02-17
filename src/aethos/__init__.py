@@ -1,4 +1,7 @@
 """
+Aethos Core Package — V1 scaffold.
+"""
+"""
 Aethos Core Package
 V1 architecture scaffold.
 
