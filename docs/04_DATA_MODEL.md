@@ -501,4 +501,12 @@ expected hashes of output JSON blocks
 
 regression tests to detect drift
 
+11) Open Questions (To Close Before Build)
 
+Do we allow multiple journal entries per day (V1: recommend single entry)?
+
+Do we store full planetary sets in V1 or only core points?
+
+Do we compute and store natal aspects in V1, or only daily transits?
+
+What minimum Human Design output is acceptable for V1 (activations only vs derived type/profile)?
