@@ -486,4 +486,11 @@ Post-validation:
 
 Only after retention proven.
 
+Critical Notes for Production
+
+Gate mapping: You must implement/use a correct Human Design mandala lon_to_gate function (counterclockwise, starts ~Gate 41 near ~295–300° tropical). The dummy above is only for illustration — never ship it.
+Your Reflector chart: Paste your actual points dict (lon values for Sun/Moon/Asc/etc.) → I can run exact output once you provide them.
+Extensibility: Add "line", "color", "codon_ring", "programming_partner" keys to GENE_KEYS dict later.
+JSON alternative: Move GENE_KEYS dict to gene_keys_data.json and load at runtime for easier maintenance.
+
 
