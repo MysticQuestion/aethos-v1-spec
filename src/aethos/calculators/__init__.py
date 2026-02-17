@@ -1,4 +1,7 @@
 """
+Aethos calculators — deterministic computation layer (scaffold).
+"""
+"""
 Calculation Layer
 
 Deterministic computational modules:
