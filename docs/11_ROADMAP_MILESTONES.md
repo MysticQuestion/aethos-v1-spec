@@ -422,4 +422,228 @@ If these are achieved:
 
 Aethos transitions from experiment → platform.
 
+XI. Dependency Graph (Critical Path Map)
+
+V1 development is gated by deterministic sequencing.
+
+Core Dependency Chain
+
+Canonical Birth Engine
+→ Transit Engine
+→ Salience Model
+→ Journal Service
+→ Correlation Engine
+→ Weekly Summary
+→ Monthly Report
+→ Beta Launch
+
+If Canonical Birth is unstable → everything collapses.
+
+If Journal pipeline fails → correlation meaningless.
+
+If Salience scoring incoherent → retention collapses.
+
+Therefore:
+
+No frontend polish before canonical engine passes validation.
+
+No marketing before correlation engine works.
+
+No expansion systems until retention validated.
+
+This is non-negotiable.
+
+XII. Resource Model (Realistic Founder Constraints)
+
+Assume:
+
+Founder (you) = 0.5–1.0 FTE strategy + product
+
+Fractional backend engineer = 0.5 FTE
+
+Optional frontend contractor = 0.25 FTE
+
+No full-time hires initially
+
+Estimated engineering hours (Phase 1):
+
+Canonical chart engine: 40–60 hours
+
+Transit + salience engine: 60–80 hours
+
+Journal service: 30–40 hours
+
+Correlation v1: 40–60 hours
+
+Frontend core views: 80–120 hours
+
+QA + integration: 40–60 hours
+
+Total: ~300–400 engineering hours
+
+At $75–125/hr:
+$22k–$50k realistic cost range.
+
+This is important.
+
+Investors respect founders who understand cost.
+
+XIII. Infrastructure Assumptions (V1)
+
+Backend:
+
+Python (FastAPI)
+
+Postgres
+
+Redis (optional cache)
+
+Stripe billing
+
+Hosting:
+
+Vercel / Render / Railway / Fly.io
+
+Monthly infra estimate: $50–$200 initially
+
+Data:
+
+Birth data encrypted
+
+Journal encrypted at rest
+
+No unnecessary third-party sharing
+
+Compliance posture:
+
+Not medical advice
+
+Not predictive claims
+
+Clear ToS + Privacy
+
+XIV. Technical Risk Register (Deeper Layer)
+TR1 — Timezone Resolution Errors
+
+Impact: incorrect birth chart.
+Mitigation: use authoritative timezone DB (IANA), test historical cases.
+
+TR2 — Swiss Ephemeris integration issues
+
+Impact: mismatched planetary data.
+Mitigation: benchmark against Astro.com known charts.
+
+TR3 — Overcomplicated salience model
+
+Impact: user confusion.
+Mitigation: keep v1 formula simple + transparent.
+
+TR4 — Correlation overstatement
+
+Impact: legal/ethical risk.
+Mitigation: enforce language filters in UI.
+
+TR5 — Journal engagement drop
+
+Impact: retention failure.
+Mitigation: friction-reduced 60-second check-in mode.
+
+XV. Budget Envelope Strategy
+Scenario A — Bootstrapped
+
+Founder funds:
+$15k–$30k initial build
+
+Pros:
+
+Control
+
+Clean cap table
+
+Strong signal at raise
+
+Cons:
+
+Slower build
+
+Founder stress
+
+Scenario B — Pre-Seed Before Build
+
+Raise $100k–$250k
+
+Pros:
+
+Faster execution
+
+Reduced founder risk
+
+Cons:
+
+Valuation pressure
+
+Build before validation
+
+Roadmap assumes Scenario A until proven otherwise.
+
+XVI. Kill Criteria (Intellectual Honesty Clause)
+
+If after 90 days of beta:
+
+Retention <40%
+
+Journaling compliance <30%
+
+Clarity score <6
+
+Users describe product as “confusing”
+
+Support burden > 1 ticket per 10 users per week
+
+Then:
+
+Pause expansion.
+Refactor engine.
+Simplify.
+
+If refactor fails → pivot or sunset.
+
+Serious founders define kill thresholds.
+
+XVII. Expansion Gate Conditions
+
+You may not add:
+
+BaZi
+
+Full Human Design
+
+AI synthesis
+
+Social layer
+
+Until:
+
+Retention ≥60% sustained for 60 days.
+
+This protects product integrity.
+
+XVIII. Long-Term Architecture Trajectory (Post V1)
+
+If validated:
+
+Year 1 roadmap:
+
+Mobile wrapper
+
+Advanced correlation visualization
+
+API layer for enterprise
+
+Structured research partnerships
+
+Possible white-label engine
+
+But only after core retention proven.
+
 
