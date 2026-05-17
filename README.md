@@ -12,6 +12,7 @@ It contains:
 - User journeys, data model, API, architecture, analytics, QA, compliance, roadmap, and hiring artifacts under [`docs/`](docs/).
 - Early Python calculation-layer scaffolding under [`src/aethos/`](src/aethos/).
 - Implementation runbooks and helper scripts for the website/app repositories under [`docs/runbooks/`](docs/runbooks/) and [`scripts/`](scripts/).
+- Security remediation artifacts for profile RLS, authenticated Edge Functions, and protected server hooks under [`supabase/migrations/`](supabase/migrations/) and [`docs/runbooks/security-remediation.md`](docs/runbooks/security-remediation.md).
 - Competitive/product research memos such as [`docs/13_VEDIC_CALCULATOR_LANDSCAPE.md`](docs/13_VEDIC_CALCULATOR_LANDSCAPE.md) and [`docs/14_BAZI_CALCULATOR_LANDSCAPE.md`](docs/14_BAZI_CALCULATOR_LANDSCAPE.md).
 
 This repo should **not** be treated as the live website repository. It should feed requirements, launch copy constraints, and API/calculation contracts into the implementation repositories.

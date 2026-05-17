@@ -47,6 +47,8 @@ Aethos should not be promoted as live until these gates pass:
 - Non-claims language appears in onboarding, website footer, settings, and any app-store-style description.
 - Privacy policy covers birth data, journal entries, analytics, retention, deletion, and no sale/brokering of personal data.
 - QA smoke test passes from public landing page through first journal entry.
+- Public `profiles` access is locked down with owner-only RLS and anonymous checks prove birth data is not readable.
+- AI Edge Functions and service-role server hooks reject anonymous requests.
 
 ## Immediate next actions
 
