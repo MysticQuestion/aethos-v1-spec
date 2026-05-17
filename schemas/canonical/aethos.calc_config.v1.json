@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aethos.app/schemas/canonical/aethos.calc_config.v1.json",
+  "title": "Aethos Calculator Config (v1)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["zodiac_system", "house_system", "orb_policy", "points_enabled"],
+  "properties": {
+    "zodiac_system": { "type": "string", "enum": ["tropical", "sidereal"] },
+    "ayanamsa": { "type": ["string", "null"], "enum": ["lahiri", "raman", "fagan_bradley", null] },
+    "house_system": { "type": "string", "enum": ["placidus", "whole_sign", "equal", "koch", "regiomontanus", "campanus"] },
+    "orb_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conjunction", "opposition", "trine", "square", "sextile"],
+      "properties": {
+        "conjunction": { "type": "number", "minimum": 0, "maximum": 12 },
+        "opposition": { "type": "number", "minimum": 0, "maximum": 12 },
+        "trine": { "type": "number", "minimum": 0, "maximum": 12 },
+        "square": { "type": "number", "minimum": 0, "maximum": 12 },
+        "sextile": { "type": "number", "minimum": 0, "maximum": 8 },
+        "minor": { "type": "number", "minimum": 0, "maximum": 5, "default": 2 }
+      }
+    },
+    "points_enabled": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["sun", "moon", "mercury", "venus", "mars", "jupiter", "saturn", "uranus", "neptune", "pluto", "north_node", "south_node", "chiron", "lilith", "ascendant", "midheaven", "part_of_fortune"] },
+      "uniqueItems": true
+    },
+    "timing_windows": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "transit_window_days": { "type": "integer", "minimum": 1, "maximum": 45, "default": 7 },
+        "station_window_days": { "type": "integer", "minimum": 1, "maximum": 21, "default": 5 },
+        "eclipse_window_days": { "type": "integer", "minimum": 1, "maximum": 60, "default": 14 }
+      }
+    },
+    "schema_version": { "type": "string", "const": "1.0.0" }
+  }
+}
