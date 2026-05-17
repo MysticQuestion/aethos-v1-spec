@@ -35,6 +35,9 @@ API response shapes and stored payload schemas must remain stable or be versione
 ### 1.5 Safety & Compliance
 Non-claims language must be present and no deterministic “event prediction” phrasing must enter templates.
 
+### 1.6 Security & Privacy Gates
+Sensitive birth/profile data must never be publicly readable. AI-credit-consuming Edge Functions and service-role server hooks must reject unauthenticated requests before provider calls or database writes. The release checklist must include RLS policy review, anonymous-client negative tests, and hook/Edge Function auth tests.
+
 ---
 
 ## 2) Test Environments

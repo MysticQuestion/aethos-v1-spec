@@ -1,0 +1,52 @@
+name: Production Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  production-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Detect web app package
+        id: package
+        shell: bash
+        run: |
+          if [ -f package.json ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "No package.json found in this spec repository; production web build must run in the implementation repository."
+          fi
+
+      - name: Install dependencies
+        if: steps.package.outputs.present == 'true'
+        shell: bash
+        run: |
+          if [ -f pnpm-lock.yaml ]; then
+            corepack enable
+            pnpm install --frozen-lockfile
+          elif [ -f yarn.lock ]; then
+            corepack enable
+            yarn install --frozen-lockfile
+          elif [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Run production build
+        if: steps.package.outputs.present == 'true'
+        run: npm run build
+
+      - name: Fail on duplicate generated route trees
+        if: steps.package.outputs.present == 'true'
+        run: node scripts/check-route-tree-single-generation.mjs
