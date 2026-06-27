@@ -83,8 +83,64 @@ The current canonical schemas are in `schemas/canonical/`:
 - `aethos.timing_event.v1.json`
 - `aethos.insight_object.v1.json`
 - `aethos.report_module.v1.json`
+- `mystic_sage.resource.v1.json`
 
 These schemas should be treated as contracts between the app UI, backend calculation services, report generation, and future practitioner/enterprise APIs.
+
+
+## Launch-readiness documentation
+
+This repository now includes implementation guidance for the Mystic Sage public platform and the deployable Aethos app:
+
+- `docs/IMPLEMENTATION_AUDIT.md` — audited state of this checkout and limitations.
+- `docs/MYSTIC_SAGE_PLATFORM_ROADMAP.md` — public platform and Aethos workspace roadmap.
+- `docs/AETHOS_ENGINE_ROADMAP.md` — deterministic calculation, timing, report, and API roadmap.
+- `docs/CONTENT_QUALITY_STANDARD.md` — copy, resource, workshop, tool, and status standards.
+- `docs/DESIGN_SYSTEM.md` — noir/minimal/smoke visual identity and component guidance.
+- `docs/RESOURCE_LINK_AUDIT.md` — route/link/resource/workshop deduplication procedure.
+- `docs/DEPLOYMENT_CHECKLIST.md` — Vite/TanStack/Vercel deployment and env-var checklist.
+- `schemas/canonical/mystic_sage.resource.v1.json` — canonical resource metadata schema.
+- `docs/SITE_DEPLOYMENT_RUNBOOK.md` — explicit explanation of why spec-repo changes do not auto-update live sites, plus deployment steps.
+- `docs/FRONTEND_EXECUTION_HANDOFF.md` — concrete step-by-step execution plan to implement these specs in deployable frontend repos.
+
+
+## Portable Aethos MVP implementation
+
+This repository now includes a portable Vite/TypeScript implementation of the Aethos identity-intelligence and timing-intelligence MVP. It was added here because the primary frontend repository could not be cloned from the execution environment. The implementation can be copied into `MysticQuestion/aethos-your-inner-compass` for production deployment.
+
+### Routes
+
+- `/` — public Aethos landing page.
+- `/onboarding` — local birth-intake and preference flow.
+- `/dashboard` — profile, timing, journal, report, and reflection overview.
+- `/profile` — structured symbolic profile.
+- `/journal` — local journal composer and entry history.
+- `/reports` — deterministic Markdown report generation.
+- `/methodology` — responsible-use and interpretive limits.
+- `/settings` — storage mode and local data reset.
+
+### Local development
+
+```bash
+npm install
+npm run dev
+```
+
+### Verification
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+npm run build
+```
+
+### Data modes
+
+- Local mode works without environment variables and stores data in this browser only.
+- Supabase mode is enabled only when client-safe public variables are configured.
+
+See `docs/AETHOS_IMPLEMENTATION_NOTES.md`, `docs/DEPLOYMENT.md`, `docs/RESPONSIBLE_USE.md`, and `docs/DATABASE_SCHEMA.md`.
 
 ## App deployment target
 
