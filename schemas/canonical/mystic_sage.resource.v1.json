@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mysticsage.xyz/schemas/canonical/mystic_sage.resource.v1.json",
+  "title": "Mystic Sage Resource (v1)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "category", "href", "accessType", "status", "level", "summary", "tags"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "category": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tradition": {
+      "type": "string"
+    },
+    "author": {
+      "type": "string"
+    },
+    "sourceName": {
+      "type": "string"
+    },
+    "href": {
+      "type": "string",
+      "minLength": 1
+    },
+    "accessType": {
+      "type": "string",
+      "enum": ["internal", "external", "download", "archive", "article", "course"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["published", "in-development", "reference", "deprecated"]
+    },
+    "level": {
+      "type": "string",
+      "enum": ["start-here", "intermediate", "advanced"]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      },
+      "uniqueItems": true
+    },
+    "lastReviewed": {
+      "type": "string",
+      "format": "date"
+    },
+    "rightsNote": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    }
+  }
+}
