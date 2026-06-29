@@ -1,0 +1,2 @@
+export type ActionExperiment = 'observe' | 'initiate' | 'pause' | 'repair' | 'complete' | 'rest' | 'communicate' | 'decide later';
+export interface EmaJournalEntry { id: string; mood: number; stress: number; focus: number; sleepQuality: number; socialConnection: number; conflictLevel: number; creativity: number; decisionPressure: number; bodyEnergy: number; clarity: number; freeText: string; tags: string[]; linkedTimingWindowIds: string[]; createdAt: string; updatedAt: string; }

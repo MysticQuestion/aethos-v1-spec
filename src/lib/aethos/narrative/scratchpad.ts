@@ -1,0 +1,6 @@
+export type ScratchpadSection = 'INPUT_CONTEXT' | 'CHART_FACTS' | 'TIMING_EVENTS' | 'JOURNAL_SIGNALS' | 'THEME_SCORES' | 'INTERPRETIVE_CONSTRAINTS' | 'PLANNING_NOTES' | 'REPORT_DRAFT' | 'RESPONSIBLE_USE_NOTES';
+export interface Scratchpad { id: string; sections: Record<ScratchpadSection, string[]>; createdAt: string; updatedAt: string; }
+export const SCRATCHPAD_SECTIONS: ScratchpadSection[] = ['INPUT_CONTEXT', 'CHART_FACTS', 'TIMING_EVENTS', 'JOURNAL_SIGNALS', 'THEME_SCORES', 'INTERPRETIVE_CONSTRAINTS', 'PLANNING_NOTES', 'REPORT_DRAFT', 'RESPONSIBLE_USE_NOTES'];
+export function createScratchpad(): Scratchpad { const now = new Date().toISOString(); return { id: `scratchpad-${Date.now()}`, sections: Object.fromEntries(SCRATCHPAD_SECTIONS.map((section) => [section, []])) as unknown as Record<ScratchpadSection, string[]>, createdAt: now, updatedAt: now }; }
+export function appendScratchpadSection(scratchpad: Scratchpad, section: ScratchpadSection, note: string): Scratchpad { return { ...scratchpad, sections: { ...scratchpad.sections, [section]: [...scratchpad.sections[section], note] }, updatedAt: new Date().toISOString() }; }
+export function validateScratchpad(scratchpad: Scratchpad): boolean { return SCRATCHPAD_SECTIONS.every((section) => Array.isArray(scratchpad.sections[section])); }

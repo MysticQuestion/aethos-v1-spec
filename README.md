@@ -38,8 +38,92 @@ The current canonical schemas are in `schemas/canonical/`:
 - `aethos.timing_event.v1.json`
 - `aethos.insight_object.v1.json`
 - `aethos.report_module.v1.json`
+- `mystic_sage.resource.v1.json`
 
 These schemas should be treated as contracts between the app UI, backend calculation services, report generation, and future practitioner/enterprise APIs.
+
+
+## Launch-readiness documentation
+
+This repository now includes implementation guidance for the Mystic Sage public platform and the deployable Aethos app:
+
+- `docs/IMPLEMENTATION_AUDIT.md` — audited state of this checkout and limitations.
+- `docs/MYSTIC_SAGE_PLATFORM_ROADMAP.md` — public platform and Aethos workspace roadmap.
+- `docs/AETHOS_ENGINE_ROADMAP.md` — deterministic calculation, timing, report, and API roadmap.
+- `docs/CONTENT_QUALITY_STANDARD.md` — copy, resource, workshop, tool, and status standards.
+- `docs/DESIGN_SYSTEM.md` — noir/minimal/smoke visual identity and component guidance.
+- `docs/RESOURCE_LINK_AUDIT.md` — route/link/resource/workshop deduplication procedure.
+- `docs/DEPLOYMENT_CHECKLIST.md` — Vite/TanStack/Vercel deployment and env-var checklist.
+- `schemas/canonical/mystic_sage.resource.v1.json` — canonical resource metadata schema.
+- `docs/SITE_DEPLOYMENT_RUNBOOK.md` — explicit explanation of why spec-repo changes do not auto-update live sites, plus deployment steps.
+- `docs/FRONTEND_EXECUTION_HANDOFF.md` — concrete step-by-step execution plan to implement these specs in deployable frontend repos.
+
+
+## Portable Aethos MVP implementation
+
+This repository now includes a portable Vite/TypeScript implementation of the Aethos identity-intelligence and timing-intelligence MVP. It was added here because the primary frontend repository could not be cloned from the execution environment. The implementation can be copied into `MysticQuestion/aethos-your-inner-compass` for production deployment.
+
+### Routes
+
+- `/` — public Aethos landing page.
+- `/onboarding` — local birth-intake and preference flow.
+- `/dashboard` — profile, timing, journal, report, and reflection overview.
+- `/profile` — structured symbolic profile.
+- `/journal` — local journal composer and entry history.
+- `/reports` — deterministic Markdown report generation.
+- `/methodology` — responsible-use and interpretive limits.
+- `/settings` — storage mode and local data reset.
+
+### Local development
+
+```bash
+npm install
+npm run dev
+```
+
+### Verification
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+npm run build
+```
+
+### Data modes
+
+- Local mode works without environment variables and stores data in this browser only.
+- Supabase mode is enabled only when client-safe public variables are configured.
+
+See `docs/AETHOS_IMPLEMENTATION_NOTES.md`, `docs/DEPLOYMENT.md`, `docs/RESPONSIBLE_USE.md`, and `docs/DATABASE_SCHEMA.md`.
+
+
+## Aethos Intelligence Core
+
+The portable MVP now includes an intelligence-core scaffold:
+
+- Astro-Integration Kernel modules for zodiac math, aspects, retrogrades/stations, demo ephemeris, natal chart scaffolding, transit events, and timing windows.
+- Timing intelligence modules for theme scoring, intensity, confidence, recommendations, and pattern maps.
+- EMA-style journal calibration modules for baseline comparison and learning-mode insights.
+- Narrative scratchpad/orchestrator modules with deterministic planning and writing agents.
+- `/timing-lab` route for active windows, event source table, calibration, action experiments, and raw lab-mode transparency.
+
+The current calculation mode is deterministic demo mode. Swiss Ephemeris-grade calculation is intentionally deferred to a future server-side provider; no LLM is used to calculate chart facts.
+
+See `docs/AETHOS_INTELLIGENCE_CORE.md`, `docs/EPHEMERIS_PROVIDER.md`, `docs/TIMING_INTELLIGENCE.md`, `docs/JOURNAL_CALIBRATION.md`, and `docs/NARRATIVE_SERVICE.md`.
+
+
+## Backend, ephemeris, storage, and privacy layer
+
+The portable MVP now includes backend/data-layer contracts:
+
+- Typed API contracts for `POST /api/aethos/chart`, `POST /api/aethos/transits`, `POST /api/aethos/timing-windows`, and `GET /api/aethos/provider-status`.
+- Calculation metadata utilities for reproducible input hashes, provider ids/versions, modes, warnings, coordinates, timezone, house system, and zodiac mode.
+- Provider architecture for deterministic demo mode and future server-side ephemeris mode.
+- Local storage router for profiles, birth intakes, natal charts, transit events, timing windows, journal entries, reports, export, import, and deletion.
+- Settings/privacy controls for export and local deletion workflows.
+
+See `docs/BACKEND_ARCHITECTURE.md`, `docs/SWISS_EPHEMERIS_SERVICE.md`, and `docs/PRIVACY_AND_DATA_RIGHTS.md`.
 
 ## App deployment target
 

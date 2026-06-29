@@ -1,0 +1,3 @@
+export const AETHOS_LOCAL_KEYS = ['aethos.local.state.v1', 'aethos.storage.profile.v1', 'aethos.storage.birthIntake.v1', 'aethos.storage.natalChart.v1', 'aethos.storage.transitEvents.v1', 'aethos.storage.timingWindows.v1', 'aethos.storage.journalEntries.v1', 'aethos.storage.reports.v1'];
+export function deleteLocalAethosData(keys = AETHOS_LOCAL_KEYS): void { for (const key of keys) window.localStorage.removeItem(key); }
+export function deleteProfileData(): void { for (const key of ['aethos.local.state.v1', 'aethos.storage.profile.v1', 'aethos.storage.birthIntake.v1', 'aethos.storage.natalChart.v1']) window.localStorage.removeItem(key); }
