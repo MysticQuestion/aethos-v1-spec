@@ -23,6 +23,18 @@ Provide deterministic timing activations and a structured journal archive so use
 - BaZi: Four Pillars (mode declared)
 - Numerology: basic core numbers
 
+### Vedic competitive guardrails
+- Treat Vedic/Jyotish as a calculation-backed symbolic layer, not a generic Kundli prediction product.
+- Persist zodiac mode, Lahiri ayanamsa, ayanamsa value, ephemeris version, and computation version in every Vedic payload.
+- Defer D1-D60 varga UI, dasha narratives, muhurta/electional advice, remedies, and AI astrologer chat until the core timing + journaling loop is validated.
+- Keep all Vedic copy non-deterministic and reflective; see `docs/13_VEDIC_CALCULATOR_LANDSCAPE.md`.
+
+### BaZi competitive guardrails
+- Treat BaZi/Four Pillars as deterministic symbolic profile facts, not fortune forecasting.
+- Persist calendar basis, solar-time policy, solar-terms source, timezone source, birth-time confidence, and computation version in every BaZi payload.
+- Defer luck pillar narratives, annual fortune forecasts, symbolic-star UI, remedial advice, and AI BaZi chat until the core timing + journaling loop is validated.
+- Keep all BaZi copy non-deterministic and reflective; see `docs/14_BAZI_CALCULATOR_LANDSCAPE.md`.
+
 ### Dashboard
 - Core signatures: Sun/Moon/Asc, HD type/profile, BaZi Day Master
 - Today’s top activations (transit-to-natal)

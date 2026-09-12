@@ -5,7 +5,7 @@ Aethos is a privacy-first, deterministic symbolic analytics product that compute
 
 This repo contains:
 - product and engineering specifications (`/docs`)
-- decision records (`/decisions`)
+- decision records (`docs/decisions`)
 - early scaffold modules (`/src`)
 
 We are hiring engineering talent to turn spec into production.
@@ -108,7 +108,7 @@ We are hiring engineering talent to turn spec into production.
 - API Spec (`docs/05_API_SPEC.md`)
 - QA Plan (`docs/10_QA_TEST_PLAN.md`)
 - Compliance framework (`docs/08_COMPLIANCE_NONCLAIMS.md`)
-- ADRs (`/decisions`)
+- ADRs (`docs/decisions`)
 - Scaffold modules (`/src`)
 
 ---
