@@ -10,9 +10,6 @@
 
 begin;
 
-alter table if exists public.profiles enable row level security;
-alter table if exists public.profiles force row level security;
-
 do $$
 declare
   owner_column text;
@@ -22,6 +19,9 @@ begin
     raise notice 'public.profiles does not exist; skipping profile RLS remediation.';
     return;
   end if;
+
+  alter table public.profiles enable row level security;
+  alter table public.profiles force row level security;
 
   revoke all on table public.profiles from anon;
   revoke all on table public.profiles from authenticated;

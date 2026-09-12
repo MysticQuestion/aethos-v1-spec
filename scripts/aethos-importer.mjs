@@ -170,7 +170,7 @@ async function main() {
     tables: compareTables(userIds, args.sourceDatabaseUrl, args.targetDatabaseUrl),
     missing_assets: checkAssets(args.repoRoot),
     sql_preview: sqlPreview,
-    would_apply_changes: sqlPreview.length > 0,
+    would_apply_changes: args.apply && sqlPreview.length > 0,
   };
   report.finished_at = new Date().toISOString();
 
