@@ -79,18 +79,15 @@ function buildSqlPreview(userIds) {
   });
 }
 
-function commandExists(command) {
-  const result = spawnSync(command, ['--version'], { encoding: 'utf8' });
-  return !result.error;
-}
-
 function runPsql(databaseUrl, sql) {
   if (!databaseUrl) return { status: 'skipped', reason: 'database URL not provided' };
-  if (!commandExists('psql')) return { status: 'skipped', reason: 'psql is not installed' };
   const result = spawnSync('psql', [databaseUrl, '--no-psqlrc', '--tuples-only', '--no-align', '--command', sql], {
     encoding: 'utf8',
     maxBuffer: 10 * 1024 * 1024,
   });
+  if (result.error) {
+    return { status: 'skipped', reason: result.error.code === 'ENOENT' ? 'psql is not installed' : result.error.message };
+  }
   if (result.status !== 0) {
     return { status: 'error', error: result.stderr.trim() || result.stdout.trim() };
   }
@@ -174,7 +171,7 @@ async function main() {
     tables: compareTables(userIds, args.sourceDatabaseUrl, args.targetDatabaseUrl),
     asset_checks: collectAssetChecks(args.repoRoot),
     sql_preview: sqlPreview,
-    would_apply_changes: args.apply && sqlPreview.length > 0,
+    would_apply_changes: sqlPreview.length > 0,
   };
   report.finished_at = new Date().toISOString();
 

@@ -65,7 +65,7 @@ The importer should emit a report that the admin UI can render directly:
     }
   ],
   "sql_preview": ["insert into ..."],
-  "would_apply_changes": false
+  "would_apply_changes": true
 }
 ```
 

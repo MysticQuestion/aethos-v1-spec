@@ -48,7 +48,17 @@ jobs:
 
       - name: Run production build
         if: steps.package.outputs.present == 'true'
-        run: npm run build
+        shell: bash
+        run: |
+          if [ -f pnpm-lock.yaml ]; then
+            corepack enable
+            pnpm build
+          elif [ -f yarn.lock ]; then
+            corepack enable
+            yarn build
+          else
+            npm run build
+          fi
 
       - name: Fail on duplicate generated route trees
         if: steps.package.outputs.present == 'true'
