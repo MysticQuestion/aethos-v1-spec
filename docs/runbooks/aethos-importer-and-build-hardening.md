@@ -52,7 +52,7 @@ The importer should emit a report that the admin UI can render directly:
       "matches": true
     }
   ],
-  "missing_assets": [
+  "asset_checks": [
     {
       "type": "edge_function",
       "name": "generate-profile",

@@ -67,6 +67,7 @@ Finalize `docs/decisions/ADR-0001-repository-ownership-and-launch-path.md` with:
 - Final domain/subdomain path.
 - Required launch gates.
 - Rollback owner and procedure.
+
 ## Implementation runbooks
 
 - Importer, admin UI, Edge Function, environment-variable, TanStack Router, and CI hardening requirements live in `docs/runbooks/aethos-importer-and-build-hardening.md`.

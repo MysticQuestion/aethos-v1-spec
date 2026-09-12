@@ -80,7 +80,8 @@ function buildSqlPreview(userIds) {
 }
 
 function commandExists(command) {
-  return spawnSync('bash', ['-lc', `command -v ${command}`], { encoding: 'utf8' }).status === 0;
+  const result = spawnSync(command, ['--version'], { encoding: 'utf8' });
+  return !result.error;
 }
 
 function runPsql(databaseUrl, sql) {
@@ -100,9 +101,9 @@ function runPsql(databaseUrl, sql) {
   }
 }
 
-function checkAssets(repoRoot) {
+function collectAssetChecks(repoRoot) {
   const root = resolve(repoRoot);
-  const missingAssets = [];
+  const assetChecks = [];
 
   for (const fn of EDGE_FUNCTIONS) {
     const candidates = [
@@ -111,12 +112,15 @@ function checkAssets(repoRoot) {
       resolve(root, 'supabase/functions', fn, 'index.js'),
       resolve(root, 'supabase/functions', fn, 'index.mjs'),
     ];
-    if (!candidates.some((candidate) => existsSync(candidate))) {
-      missingAssets.push({ type: 'edge_function', name: fn, status: 'missing', expected_paths: candidates });
-    }
+    assetChecks.push({
+      type: 'edge_function',
+      name: fn,
+      status: candidates.some((candidate) => existsSync(candidate)) ? 'present' : 'missing',
+      expected_paths: candidates,
+    });
 
     for (const envName of REQUIRED_ENV[fn] ?? []) {
-      missingAssets.push({
+      assetChecks.push({
         type: 'env_var',
         function: fn,
         name: envName,
@@ -125,7 +129,7 @@ function checkAssets(repoRoot) {
     }
   }
 
-  return missingAssets;
+  return assetChecks;
 }
 
 function compareTables(userIds, sourceDatabaseUrl, targetDatabaseUrl) {
@@ -168,7 +172,7 @@ async function main() {
     finished_at: null,
     shared_user_ids: userIds,
     tables: compareTables(userIds, args.sourceDatabaseUrl, args.targetDatabaseUrl),
-    missing_assets: checkAssets(args.repoRoot),
+    asset_checks: collectAssetChecks(args.repoRoot),
     sql_preview: sqlPreview,
     would_apply_changes: args.apply && sqlPreview.length > 0,
   };
