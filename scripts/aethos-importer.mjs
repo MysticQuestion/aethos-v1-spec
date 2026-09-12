@@ -29,7 +29,7 @@ const REQUIRED_ENV = {
 };
 
 function parseArgs(argv) {
-  const args = { dryRun: false, apply: false, repoRoot: process.cwd() };
+  const args = { dryRun: false, apply: false, repoRoot: process.cwd(), sourceSchema: 'aethos', targetSchema: 'mysticsage' };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--dry-run') args.dryRun = true;
@@ -37,6 +37,8 @@ function parseArgs(argv) {
     else if (arg === '--user-ids') args.userIds = argv[++i];
     else if (arg === '--source-database-url') args.sourceDatabaseUrl = argv[++i];
     else if (arg === '--target-database-url') args.targetDatabaseUrl = argv[++i];
+    else if (arg === '--source-schema') args.sourceSchema = argv[++i];
+    else if (arg === '--target-schema') args.targetSchema = argv[++i];
     else if (arg === '--report-json') args.reportJson = argv[++i];
     else if (arg === '--repo-root') args.repoRoot = argv[++i];
     else if (arg === '--help' || arg === '-h') args.help = true;
@@ -46,7 +48,7 @@ function parseArgs(argv) {
 }
 
 function usage() {
-  return `Usage: node scripts/aethos-importer.mjs --dry-run --user-ids <comma-list-or-file> [options]\n\nOptions:\n  --source-database-url <url>   Aethos source Postgres/Supabase URL\n  --target-database-url <url>   Mystic Sage target Postgres/Supabase URL\n  --report-json <path>          Write verification report JSON\n  --repo-root <path>            Repository root used for Edge Function asset checks\n  --apply                       Reserved for the real write path; not allowed with --dry-run\n`;
+  return `Usage: node scripts/aethos-importer.mjs --dry-run --user-ids <comma-list-or-file> [options]\n\nOptions:\n  --source-database-url <url>   Aethos source Postgres/Supabase URL\n  --target-database-url <url>   Mystic Sage target Postgres/Supabase URL\n  --source-schema <name>        Source schema name (default: aethos)\n  --target-schema <name>        Target schema name (default: mysticsage)\n  --report-json <path>          Write verification report JSON\n  --repo-root <path>            Repository root used for Edge Function asset checks\n  --apply                       Reserved for the real write path; not allowed with --dry-run\n`;
 }
 
 async function readUserIds(input) {
@@ -66,16 +68,25 @@ function idsSql(userIds) {
   return userIds.map(sqlString).join(', ');
 }
 
-function buildChecksumSql(table, quotedIds) {
-  const where = table.filter(quotedIds);
-  return `select json_build_object('row_count', count(*), 'checksum', coalesce('sha256:' || encode(digest(coalesce(string_agg(to_jsonb(t)::text, '' order by ${table.pk}::text), ''), 'sha256'), 'sha256:')) from ${table.name} t where ${where};`;
+function sqlIdentifier(value) {
+  if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(value)) throw new Error(`Invalid SQL identifier: ${value}`);
+  return `"${value}"`;
 }
 
-function buildSqlPreview(userIds) {
+function buildChecksumSql(table, quotedIds, schemaName, includeChecksum) {
+  const where = table.filter(quotedIds);
+  const qualifiedTable = `${sqlIdentifier(schemaName)}.${sqlIdentifier(table.name)}`;
+  if (!includeChecksum) {
+    return `select json_build_object('row_count', count(*), 'checksum', null, 'checksum_status', 'skipped_pgcrypto_unavailable') from ${qualifiedTable} t where ${where};`;
+  }
+  return `select json_build_object('row_count', count(*), 'checksum', coalesce('sha256:' || encode(digest(coalesce(string_agg(to_jsonb(t)::text, '' order by ${table.pk}::text), ''), 'sha256'), 'hex'), 'sha256:'), 'checksum_status', 'ok') from ${qualifiedTable} t where ${where};`;
+}
+
+function buildSqlPreview(userIds, sourceSchema, targetSchema) {
   const quotedIds = idsSql(userIds);
   return TABLES.map((table) => {
     const where = table.filter(quotedIds);
-    return `-- ${table.name}\ninsert into mysticsage.${table.name}\nselect * from aethos.${table.name}\nwhere ${where}\non conflict do nothing;`;
+    return `-- ${table.name}\ninsert into ${targetSchema}.${table.name}\nselect * from ${sourceSchema}.${table.name}\nwhere ${where}\non conflict do nothing;`;
   });
 }
 
@@ -96,6 +107,11 @@ function runPsql(databaseUrl, sql) {
   } catch (error) {
     return { status: 'error', error: `Unable to parse psql JSON output: ${error.message}`, raw: result.stdout.trim() };
   }
+}
+
+function hasPgcrypto(databaseUrl) {
+  const result = runPsql(databaseUrl, "select json_build_object('pgcrypto_available', exists (select 1 from pg_extension where extname = 'pgcrypto'));");
+  return result.status === 'ok' ? Boolean(result.pgcrypto_available) : null;
 }
 
 function collectAssetChecks(repoRoot) {
@@ -129,22 +145,26 @@ function collectAssetChecks(repoRoot) {
   return assetChecks;
 }
 
-function compareTables(userIds, sourceDatabaseUrl, targetDatabaseUrl) {
+function compareTables(userIds, sourceDatabaseUrl, targetDatabaseUrl, sourceSchema, targetSchema) {
   const quotedIds = idsSql(userIds);
+  const sourcePgcrypto = hasPgcrypto(sourceDatabaseUrl);
+  const targetPgcrypto = hasPgcrypto(targetDatabaseUrl);
   return TABLES.map((table) => {
-    const source = runPsql(sourceDatabaseUrl, buildChecksumSql(table, quotedIds));
-    const target = runPsql(targetDatabaseUrl, buildChecksumSql(table, quotedIds));
+    const source = runPsql(sourceDatabaseUrl, buildChecksumSql(table, quotedIds, sourceSchema, sourcePgcrypto !== false));
+    const target = runPsql(targetDatabaseUrl, buildChecksumSql(table, quotedIds, targetSchema, targetPgcrypto !== false));
     return {
       table: table.name,
       source_count: source.row_count ?? null,
       target_count: target.row_count ?? null,
       source_checksum: source.checksum ?? null,
       target_checksum: target.checksum ?? null,
+      source_checksum_status: source.checksum_status ?? null,
+      target_checksum_status: target.checksum_status ?? null,
       source_status: source.status,
       target_status: target.status,
       source_error: source.error,
       target_error: target.error,
-      matches: source.status === 'ok' && target.status === 'ok' && source.row_count === target.row_count && source.checksum === target.checksum,
+      matches: source.status === 'ok' && target.status === 'ok' && source.row_count === target.row_count && ((source.checksum && target.checksum && source.checksum === target.checksum) || (!source.checksum && !target.checksum)),
     };
   });
 }
@@ -162,13 +182,15 @@ async function main() {
   const userIds = await readUserIds(args.userIds);
   if (userIds.length === 0) throw new Error('At least one shared user ID is required via --user-ids.');
 
-  const sqlPreview = buildSqlPreview(userIds);
+  const sqlPreview = buildSqlPreview(userIds, args.sourceSchema, args.targetSchema);
   const report = {
     mode: 'dry-run',
     started_at: startedAt,
     finished_at: null,
     shared_user_ids: userIds,
-    tables: compareTables(userIds, args.sourceDatabaseUrl, args.targetDatabaseUrl),
+    source_schema: args.sourceSchema,
+    target_schema: args.targetSchema,
+    tables: compareTables(userIds, args.sourceDatabaseUrl, args.targetDatabaseUrl, args.sourceSchema, args.targetSchema),
     asset_checks: collectAssetChecks(args.repoRoot),
     sql_preview: sqlPreview,
     would_apply_changes: sqlPreview.length > 0,
