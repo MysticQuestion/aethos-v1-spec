@@ -26,6 +26,7 @@ begin
   revoke all on table public.profiles from anon;
   revoke all on table public.profiles from authenticated;
   grant select, insert, update, delete on table public.profiles to authenticated;
+  grant select, insert, update, delete on table public.profiles to service_role;
 
   if exists (
     select 1

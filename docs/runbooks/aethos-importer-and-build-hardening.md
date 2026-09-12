@@ -141,10 +141,10 @@ Adjust paths if the project uses a custom `generatedRouteTree` location.
 
 ### Route generation logging
 
-Build logs must include the exact regenerated route tree path and timestamp. Log in ISO-8601 UTC, for example:
+Build logs must include the exact generated route tree path and timestamp. Log in ISO-8601 UTC, for example:
 
 ```text
-[route-tree] regenerated path=/workspace/app/src/routeTree.gen.ts timestamp=2026-05-11T00:00:00.000Z
+[route-tree] generated path=/workspace/app/src/routeTree.gen.ts timestamp=2026-05-11T00:00:00.000Z
 ```
 
 ### Duplicate generation guard

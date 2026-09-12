@@ -86,7 +86,9 @@ function buildSqlPreview(userIds, sourceSchema, targetSchema) {
   const quotedIds = idsSql(userIds);
   return TABLES.map((table) => {
     const where = table.filter(quotedIds);
-    return `-- ${table.name}\ninsert into ${targetSchema}.${table.name}\nselect * from ${sourceSchema}.${table.name}\nwhere ${where}\non conflict do nothing;`;
+    const qualifiedSource = `${sqlIdentifier(sourceSchema)}.${sqlIdentifier(table.name)}`;
+    const qualifiedTarget = `${sqlIdentifier(targetSchema)}.${sqlIdentifier(table.name)}`;
+    return `-- ${table.name}\ninsert into ${qualifiedTarget}\nselect * from ${qualifiedSource}\nwhere ${where}\non conflict do nothing;`;
   });
 }
 
