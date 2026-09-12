@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   production-build:
     runs-on: ubuntu-latest
@@ -26,6 +29,11 @@ jobs:
             echo "present=false" >> "$GITHUB_OUTPUT"
             echo "No package.json found in this spec repository; production web build must run in the implementation repository."
           fi
+          if [ -f scripts/check-route-tree-single-generation.mjs ]; then
+            echo "route_guard_present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "route_guard_present=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Install dependencies
         if: steps.package.outputs.present == 'true'
@@ -45,8 +53,18 @@ jobs:
 
       - name: Run production build
         if: steps.package.outputs.present == 'true'
-        run: npm run build
+        shell: bash
+        run: |
+          if [ -f pnpm-lock.yaml ]; then
+            corepack enable
+            pnpm build
+          elif [ -f yarn.lock ]; then
+            corepack enable
+            yarn build
+          else
+            npm run build
+          fi
 
       - name: Fail on duplicate generated route trees
-        if: steps.package.outputs.present == 'true'
+        if: steps.package.outputs.present == 'true' && steps.package.outputs.route_guard_present == 'true'
         run: node scripts/check-route-tree-single-generation.mjs

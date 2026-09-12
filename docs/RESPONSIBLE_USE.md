@@ -1,7 +1,7 @@
 # Responsible Use
 
-Aethos is a symbolic-intelligence and reflective self-knowledge platform. It is designed for interpretation, pattern awareness, journaling, and decision context.
+Aethos supports reflection, planning, and self-knowledge. It does not provide medical, legal, financial, psychiatric, emergency, or guaranteed predictive advice.
 
-Aethos does not provide medical, legal, financial, psychiatric, or guaranteed predictive advice. Timing windows are context markers for reflection and decision-making, not commands or fate claims.
+Timing windows are interpretive context markers, not commands or guarantees. Journal calibration describes observed patterns and should not be treated as diagnosis, treatment, cure, prevention, or professional guidance.
 
-Confidence levels describe interpretive strength, source clarity, and user-confirmed relevance. They are not certainty scores.
+LLMs must not calculate planetary positions, aspects, houses, retrogrades, stations, or timing windows. Interpretation may use structured data, but calculation must remain deterministic and auditable.

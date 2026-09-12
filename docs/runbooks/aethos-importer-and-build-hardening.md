@@ -52,7 +52,7 @@ The importer should emit a report that the admin UI can render directly:
       "matches": true
     }
   ],
-  "missing_assets": [
+  "asset_checks": [
     {
       "type": "edge_function",
       "name": "generate-profile",
@@ -65,7 +65,7 @@ The importer should emit a report that the admin UI can render directly:
     }
   ],
   "sql_preview": ["insert into ..."],
-  "would_apply_changes": false
+  "would_apply_changes": true
 }
 ```
 
@@ -141,10 +141,10 @@ Adjust paths if the project uses a custom `generatedRouteTree` location.
 
 ### Route generation logging
 
-Build logs must include the exact regenerated route tree path and timestamp. Log in ISO-8601 UTC, for example:
+Build logs must include the exact generated route tree path and timestamp. Log in ISO-8601 UTC, for example:
 
 ```text
-[route-tree] regenerated path=/workspace/app/src/routeTree.gen.ts timestamp=2026-05-11T00:00:00.000Z
+[route-tree] generated path=/workspace/app/src/routeTree.gen.ts timestamp=2026-05-11T00:00:00.000Z
 ```
 
 ### Duplicate generation guard
