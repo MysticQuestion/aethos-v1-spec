@@ -1,0 +1,35 @@
+{
+  "policy_version": "reconciliation-v2.0.0-draft.1",
+  "status": "experimental",
+  "notes": [
+    "These thresholds are initial engineering defaults for adversarial testing only; they are not empirically calibrated probabilities or validated psychological measurements.",
+    "No production release may promote this policy from experimental status without fixture coverage, representative-profile review, sensitivity analysis, and a documented methodology decision."
+  ],
+  "eligible_calculation_statuses": [
+    "fixture_verified",
+    "production_verified",
+    "verified_external_provider"
+  ],
+  "material_effect_weight_min": 0.2,
+  "convergence": {
+    "min_independent_lineages": 2,
+    "min_directional_support_ratio": 0.72,
+    "max_weighted_heterogeneity": 0.12
+  },
+  "opposition": {
+    "min_independent_lineages": 2,
+    "min_positive_support_mass": 0.3,
+    "min_negative_support_mass": 0.3,
+    "min_weighted_heterogeneity": 0.22
+  },
+  "stability": {
+    "run_leave_one_source_out": true,
+    "max_flip_count_for_high_stability": 0
+  },
+  "independence": {
+    "independent_factor": 1.0,
+    "partially_shared_factor": 0.65,
+    "derivative_factor": 0.25,
+    "derivative_counts_as_independent_lineage": false
+  }
+}

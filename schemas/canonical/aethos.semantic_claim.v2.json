@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aethos.mysticsage.xyz/schemas/canonical/aethos.semantic_claim.v2.json",
+  "title": "Aethos Semantic Claim v2",
+  "description": "A versioned semantic claim derived from one canonical source fact before cross-system reconciliation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "claim_id",
+    "claim_key",
+    "source_fact_id",
+    "source_system",
+    "evidence_lineage",
+    "scope",
+    "proposition",
+    "methodology_version",
+    "mapping_rationale",
+    "effects"
+  ],
+  "properties": {
+    "claim_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "claim_key": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9._-]+$"
+    },
+    "source_fact_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_system": {
+      "type": "string",
+      "enum": [
+        "western_astrology",
+        "vedic_astrology",
+        "bazi",
+        "human_design",
+        "gene_keys",
+        "pythagorean_numerology",
+        "chaldean_numerology",
+        "i_ching",
+        "self_knowledge",
+        "other"
+      ]
+    },
+    "evidence_lineage": {
+      "$ref": "#/$defs/evidenceLineage"
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["identity", "cycle", "situational"]
+    },
+    "evaluation_window": {
+      "$ref": "#/$defs/evaluationWindow"
+    },
+    "proposition": {
+      "type": "string",
+      "minLength": 1
+    },
+    "methodology_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mapping_rationale": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_excerpt": {
+      "type": ["string", "null"]
+    },
+    "contextual_qualifiers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "effects": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/atomicEffect"
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    }
+  },
+  "$defs": {
+    "evidenceLineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lineage_id", "independence_class"],
+      "properties": {
+        "lineage_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9._-]+$"
+        },
+        "parent_lineage_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9._-]+$"
+          },
+          "uniqueItems": true,
+          "default": []
+        },
+        "independence_class": {
+          "type": "string",
+          "enum": ["independent", "partially_shared", "derivative"]
+        },
+        "lineage_note": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "evaluationWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evaluation_time", "evaluation_timezone"],
+      "properties": {
+        "evaluation_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "evaluation_timezone": {
+          "type": "string",
+          "minLength": 1
+        },
+        "window_start": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "window_end": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      }
+    },
+    "atomicEffect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "effect_id",
+        "dimension_key",
+        "direction",
+        "magnitude",
+        "mapping_confidence",
+        "rationale"
+      ],
+      "properties": {
+        "effect_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dimension_key": {
+          "type": "string",
+          "enum": [
+            "initiation_tendency",
+            "decision_latency",
+            "energy_pacing",
+            "autonomy_interdependence",
+            "boundary_permeability",
+            "affective_intensity",
+            "evidence_style",
+            "cognitive_abstraction",
+            "stability_adaptation",
+            "risk_appetite"
+          ]
+        },
+        "direction": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "magnitude": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "mapping_confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "contextual_qualifiers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "default": []
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

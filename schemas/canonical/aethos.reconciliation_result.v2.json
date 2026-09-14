@@ -1,0 +1,433 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aethos.mysticsage.xyz/schemas/canonical/aethos.reconciliation_result.v2.json",
+  "title": "Aethos Reconciliation Result v2",
+  "description": "Deterministic reconciliation result for one atomic dimension, with source-dependence, quality decomposition, classification, and audit metadata.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "result_id",
+    "profile_id",
+    "scope",
+    "dimension_key",
+    "presentation_group",
+    "classification",
+    "policy_version",
+    "reducer_version",
+    "lineage_policy_version",
+    "system_effects",
+    "eligible_system_count",
+    "independent_lineage_count",
+    "quality",
+    "statistics",
+    "stability",
+    "generated_at"
+  ],
+  "properties": {
+    "result_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "profile_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["identity", "cycle", "situational"]
+    },
+    "dimension_key": {
+      "$ref": "#/$defs/dimensionKey"
+    },
+    "presentation_group": {
+      "type": "string",
+      "enum": [
+        "pacing_momentum",
+        "boundary_attachment",
+        "processing_epistemology",
+        "form_adaptation"
+      ]
+    },
+    "evaluation_window": {
+      "$ref": "#/$defs/evaluationWindow"
+    },
+    "classification": {
+      "type": "string",
+      "enum": [
+        "insufficient",
+        "single_source",
+        "convergence",
+        "mixed",
+        "contextual_tension",
+        "paradox",
+        "non_comparable"
+      ]
+    },
+    "classification_rationale": {
+      "type": ["string", "null"]
+    },
+    "policy_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reducer_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lineage_policy_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "system_effects": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/systemEffect"
+      }
+    },
+    "eligible_system_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "independent_lineage_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "quality": {
+      "$ref": "#/$defs/resultQuality"
+    },
+    "statistics": {
+      "$ref": "#/$defs/reconciliationStatistics"
+    },
+    "stability": {
+      "$ref": "#/$defs/stability"
+    },
+    "withheld_sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/withheldSource"
+      },
+      "default": []
+    },
+    "methodology_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "dimensionKey": {
+      "type": "string",
+      "enum": [
+        "initiation_tendency",
+        "decision_latency",
+        "energy_pacing",
+        "autonomy_interdependence",
+        "boundary_permeability",
+        "affective_intensity",
+        "evidence_style",
+        "cognitive_abstraction",
+        "stability_adaptation",
+        "risk_appetite"
+      ]
+    },
+    "evaluationWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evaluation_time", "evaluation_timezone"],
+      "properties": {
+        "evaluation_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "evaluation_timezone": {
+          "type": "string",
+          "minLength": 1
+        },
+        "window_start": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "window_end": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      }
+    },
+    "weightComponents": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_integrity",
+        "calculation_quality",
+        "mapping_confidence",
+        "contextual_relevance",
+        "temporal_fit",
+        "independence_factor",
+        "effective_weight"
+      ],
+      "properties": {
+        "input_integrity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "calculation_quality": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "mapping_confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "contextual_relevance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "temporal_fit": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "independence_factor": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "effective_weight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "systemEffect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "system_effect_id",
+        "source_system",
+        "dimension_key",
+        "score",
+        "weight_components",
+        "evidence_lineage_ids",
+        "source_fact_ids",
+        "claim_ids",
+        "calculation_status",
+        "calculation_version",
+        "methodology_version"
+      ],
+      "properties": {
+        "system_effect_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_system": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dimension_key": {
+          "$ref": "#/$defs/dimensionKey"
+        },
+        "score": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "weight_components": {
+          "$ref": "#/$defs/weightComponents"
+        },
+        "evidence_lineage_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "source_fact_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "claim_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "calculation_status": {
+          "type": "string",
+          "enum": [
+            "prototype",
+            "fixture_verified",
+            "production_verified",
+            "verified_external_provider",
+            "withheld",
+            "unavailable"
+          ]
+        },
+        "calculation_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "methodology_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reduction_note": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "resultQuality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_integrity",
+        "calculation_status",
+        "semantic_mapping_confidence",
+        "independent_source_coverage",
+        "classification_stability"
+      ],
+      "properties": {
+        "input_integrity": {
+          "$ref": "#/$defs/qualityIndicator"
+        },
+        "calculation_status": {
+          "$ref": "#/$defs/qualityIndicator"
+        },
+        "semantic_mapping_confidence": {
+          "$ref": "#/$defs/qualityIndicator"
+        },
+        "independent_source_coverage": {
+          "$ref": "#/$defs/qualityIndicator"
+        },
+        "classification_stability": {
+          "$ref": "#/$defs/qualityIndicator"
+        }
+      }
+    },
+    "qualityIndicator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label"],
+      "properties": {
+        "label": {
+          "type": "string",
+          "enum": ["low", "moderate", "high", "verified", "not_applicable"]
+        },
+        "value": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "explanation": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "reconciliationStatistics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "weighted_mean",
+        "weighted_heterogeneity",
+        "positive_support_mass",
+        "negative_support_mass",
+        "maximum_single_system_influence"
+      ],
+      "properties": {
+        "weighted_mean": {
+          "type": ["number", "null"],
+          "minimum": -1,
+          "maximum": 1
+        },
+        "weighted_heterogeneity": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "positive_support_mass": {
+          "type": "number",
+          "minimum": 0
+        },
+        "negative_support_mass": {
+          "type": "number",
+          "minimum": 0
+        },
+        "maximum_single_system_influence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "stability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "leave_one_source_out_tested",
+        "classification_flip_count",
+        "stable"
+      ],
+      "properties": {
+        "leave_one_source_out_tested": {
+          "type": "boolean"
+        },
+        "classification_flip_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "stable": {
+          "type": "boolean"
+        },
+        "note": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "withheldSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_system", "reason"],
+      "properties": {
+        "source_system": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "calculation_status": {
+          "type": ["string", "null"],
+          "enum": [
+            "prototype",
+            "fixture_verified",
+            "production_verified",
+            "verified_external_provider",
+            "withheld",
+            "unavailable",
+            null
+          ]
+        }
+      }
+    }
+  }
+}
