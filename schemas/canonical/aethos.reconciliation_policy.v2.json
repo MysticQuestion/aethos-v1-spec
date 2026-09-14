@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aethos.mysticsage.xyz/schemas/canonical/aethos.reconciliation_policy.v2.json",
+  "title": "Aethos Reconciliation Policy v2",
+  "description": "Versioned policy for eligibility, weighting, independence, thresholds, and stability rules used by Reconciliation Engine v2.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "policy_version",
+    "status",
+    "eligible_calculation_statuses",
+    "material_effect_weight_min",
+    "convergence",
+    "opposition",
+    "stability",
+    "independence"
+  ],
+  "properties": {
+    "policy_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": ["experimental", "candidate", "production"]
+    },
+    "notes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "eligible_calculation_statuses": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "prototype",
+          "fixture_verified",
+          "production_verified",
+          "verified_external_provider"
+        ]
+      }
+    },
+    "material_effect_weight_min": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "convergence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "min_independent_lineages",
+        "min_directional_support_ratio",
+        "max_weighted_heterogeneity"
+      ],
+      "properties": {
+        "min_independent_lineages": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "min_directional_support_ratio": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 1
+        },
+        "max_weighted_heterogeneity": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "opposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "min_independent_lineages",
+        "min_positive_support_mass",
+        "min_negative_support_mass",
+        "min_weighted_heterogeneity"
+      ],
+      "properties": {
+        "min_independent_lineages": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "min_positive_support_mass": {
+          "type": "number",
+          "minimum": 0
+        },
+        "min_negative_support_mass": {
+          "type": "number",
+          "minimum": 0
+        },
+        "min_weighted_heterogeneity": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "stability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_leave_one_source_out",
+        "max_flip_count_for_high_stability"
+      ],
+      "properties": {
+        "run_leave_one_source_out": {
+          "type": "boolean"
+        },
+        "max_flip_count_for_high_stability": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "independence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "independent_factor",
+        "partially_shared_factor",
+        "derivative_factor",
+        "derivative_counts_as_independent_lineage"
+      ],
+      "properties": {
+        "independent_factor": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "partially_shared_factor": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "derivative_factor": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "derivative_counts_as_independent_lineage": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
