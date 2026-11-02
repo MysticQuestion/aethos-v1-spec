@@ -1,3 +1,5 @@
+> **Mobile direction — November 2026:** [ADR-0002](docs/decisions/ADR-0002-aethos-first-mobile.md) governs the Aethos-first, account-optional native product and supersedes conflicting older product/stack assumptions below. The native candidate is `MysticQuestion/the-aethos-app`; it is not a release candidate.
+
 # Aethos V1 Spec
 
 This repository is the source-of-truth specification for the Aethos system: a deterministic symbolic analytics engine for timing intelligence, structured self-knowledge, and journaling-based pattern awareness.
