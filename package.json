@@ -11,5 +11,7 @@
     "test": "node --test tests/aethos.test.mjs"
   },
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
 }
